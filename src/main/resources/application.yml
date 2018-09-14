@@ -1,0 +1,27 @@
+server:
+  port: 8799
+spring:
+  redis:
+    host: localhost
+    port: 6379
+    timeout: 5000
+    database: 0
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/LibraryManagement?useSSL=true
+    password: welcome123
+    username: root
+  data:
+    mongodb:
+      uri: mongodb://localhost/dev
+      username: dev
+      password: dev
+  liquibase:
+    url: jdbc:mysql://localhost:3306/LibraryManagement?useSSL=true
+    user: root
+    password: welcome123
+    change-log: classpath:/db/liquibase/dev.xml
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+

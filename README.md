@@ -1,5 +1,11 @@
 ## spring-boot-cache
 
+### 项目简介
+    1. 项目中使用标准的 spring 三层架构搭建
+    2. 项目中使用 redis 作缓存
+    3. 项目中使用 mongo 做了一个简单示例
+    4. 接口管理采用了 swagger 可视化界面
+
 ### 本项目相关内容
 - 数据库：mysql
 - NoSQL : redis，mongodb

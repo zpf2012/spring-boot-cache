@@ -1,6 +1,6 @@
 ## spring-boot-cache
 
-### 本项目中使用 redis， mongodb 数据库进行测试
+### 本项目相关内容
 - 数据库：mysql
 - NoSQL : redis，mongodb
 - java version: 1.8

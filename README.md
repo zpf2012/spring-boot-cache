@@ -6,4 +6,4 @@
 - Spring boot version: 2.0.5.RELEASE
 
 ### 配置文件位置
-    - <I><B>classpath:/application.yml</b><B/>
+##### classpath:/application.yml

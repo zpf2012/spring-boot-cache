@@ -3,6 +3,7 @@ package com.hand.cache;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
+import org.springframework.kafka.annotation.EnableKafka;
 
 /**
  * @author Created by zhangpengfei on 2018/9/14 11:14.

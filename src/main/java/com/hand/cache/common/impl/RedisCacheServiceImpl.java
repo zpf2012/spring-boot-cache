@@ -22,24 +22,18 @@ public class RedisCacheServiceImpl implements RedisCacheService{
 
     @Override
     public String get(String key) {
-        return redisTemplate.execute(new RedisCallback<String>() {
-            @Override
-            public String doInRedis(RedisConnection redisConnection) throws DataAccessException {
-                RedisSerializer<String> redisSerializer = redisTemplate.getStringSerializer();
-                byte [] value = redisConnection.get(redisSerializer.serialize(key));
-                return redisSerializer.deserialize(value);
-            }
+        return redisTemplate.execute((RedisCallback<String>) redisConnection -> {
+            RedisSerializer<String> redisSerializer = redisTemplate.getStringSerializer();
+            byte [] value = redisConnection.get(redisSerializer.serialize(key));
+            return redisSerializer.deserialize(value);
         });
     }
 
     @Override
     public Boolean set(String key, String value) {
-        return redisTemplate.execute(new RedisCallback<Boolean>() {
-            @Override
-            public Boolean doInRedis(RedisConnection redisConnection) throws DataAccessException {
-                RedisSerializer<String> redisSerializer = redisTemplate.getStringSerializer();
-                return redisConnection.set(redisSerializer.serialize(key), redisSerializer.serialize(value));
-            }
+        return redisTemplate.execute((RedisCallback<Boolean>) redisConnection -> {
+            RedisSerializer<String> redisSerializer = redisTemplate.getStringSerializer();
+            return redisConnection.set(redisSerializer.serialize(key), redisSerializer.serialize(value));
         });
     }
 

@@ -43,6 +43,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public List<Book> getBooks() {
 
+        // 开启事务
         TransactionStatus status = transactionManagementUtils.begin();
 
         try {
@@ -66,8 +67,10 @@ public class BookServiceImpl implements BookService {
             mongoTemplate.insert(bookList);
             log.info("get data from mysql... ...");
         }catch (Exception e){
+            // 回滚事务
             transactionManagementUtils.rollback(status);
         }finally {
+            // 提交事务
             transactionManagementUtils.commit(status);
         }
 

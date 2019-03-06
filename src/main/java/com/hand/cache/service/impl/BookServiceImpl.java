@@ -1,10 +1,12 @@
 package com.hand.cache.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Lists;
 import com.hand.cache.common.RedisCacheService;
 import com.hand.cache.dto.Book;
 import com.hand.cache.mapper.BookMapper;
 import com.hand.cache.service.BookService;
+import com.hand.cache.utils.TransactionManagementUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
@@ -34,29 +37,40 @@ public class BookServiceImpl implements BookService {
     private RedisCacheService redisCacheService;
     @Autowired
     private MongoTemplate mongoTemplate;
+    @Autowired
+    private TransactionManagementUtils transactionManagementUtils;
 
     @Override
     public List<Book> getBooks() {
 
-        String redisData = redisCacheService.get(LIBRARY);
-        if(redisData != null){
-            log.info("get data from cache... ...");
+        TransactionStatus status = transactionManagementUtils.begin();
 
-            List<Book> bookList = JSON.parseArray(redisData, Book.class);
+        try {
+            String redisData = redisCacheService.get(LIBRARY);
+            if(redisData != null){
+                log.info("get data from cache... ...");
 
-            Book result = mongoTemplate.findOne(new Query().addCriteria(Criteria.where("bookId").is(1)), Book.class, MONGODB_COLLECTION);
+                List<Book> bookList = JSON.parseArray(redisData, Book.class);
 
-            log.info("mongo data : {}", JSON.toJSONString(result));
-            if(ObjectUtils.isEmpty(result)){
-                mongoTemplate.insert(bookList.get(0), MONGODB_COLLECTION);
+                Book result = mongoTemplate.findOne(new Query().addCriteria(Criteria.where("bookId").is(1)), Book.class, MONGODB_COLLECTION);
+
+                log.info("mongo data : {}", JSON.toJSONString(result));
+                if(ObjectUtils.isEmpty(result)){
+                    mongoTemplate.insert(bookList.get(0), MONGODB_COLLECTION);
+                }
+                return bookList;
             }
-            return bookList;
+
+            List<Book> bookList = bookMapper.getBooks();
+            redisCacheService.set(LIBRARY, JSON.toJSONString(bookMapper.getBooks()));
+            mongoTemplate.insert(bookList);
+            log.info("get data from mysql... ...");
+        }catch (Exception e){
+            transactionManagementUtils.rollback(status);
+        }finally {
+            transactionManagementUtils.commit(status);
         }
 
-        List<Book> bookList = bookMapper.getBooks();
-        redisCacheService.set(LIBRARY, JSON.toJSONString(bookMapper.getBooks()));
-        mongoTemplate.insert(bookList);
-        log.info("get data from mysql... ...");
-        return bookList;
+        return Lists.newArrayList();
     }
 }
